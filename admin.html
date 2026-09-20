@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anu Activity — Private</title>
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#fff8fb;color:#3d1524;padding:32px} .wrap{max-width:900px;margin:auto}.card{background:#fff;border:1px solid #efdce3;border-radius:22px;padding:24px;box-shadow:0 15px 45px #5c10251a}h1{margin-top:0}.muted{color:#806775}.row{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #f0e3e8}.event{font-weight:700}.time{color:#806775;font-size:14px}button{border:0;border-radius:12px;padding:11px 16px;background:#5c1025;color:#fff;cursor:pointer}#status{margin:12px 0}.empty{padding:30px 0;text-align:center;color:#806775}@media(max-width:600px){body{padding:16px}.row{display:block}.time{margin-top:5px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>ANU Activity</h1>
+<p class="muted">Private activity view. It shows only the visible interactions recorded by the surprise website.</p>
+<button id="refresh">Refresh</button>
+<div id="status" class="muted"></div>
+<div id="list"></div>
+</div>
+</div>
+<script>
+const ENDPOINT="PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+const ADMIN_TOKEN="PASTE_YOUR_ADMIN_TOKEN_HERE";
+const labels={letter_opened:"💌 Letter Opened",surprise_opened:"🎁 Surprise Opened",like_yes:"❤️ Liked This — YES",like_no:"🤍 Liked This — NO",mine_yes:"💖 Will You Be Mine — YES",mine_think:"🤔 Will You Be Mine — Let me think"};
+async function load(){const status=document.getElementById('status'),list=document.getElementById('list');status.textContent='Loading…';list.innerHTML='';if(ENDPOINT.includes('PASTE_YOUR')){status.textContent='Add your Apps Script URL and admin token in this file first.';return}try{const r=await fetch(ENDPOINT+'?token='+encodeURIComponent(ADMIN_TOKEN));if(!r.ok)throw new Error('Request failed');const data=await r.json();const events=Array.isArray(data.events)?data.events:[];if(!events.length){list.innerHTML='<div class="empty">No interactions yet.</div>';}else{events.reverse().forEach(e=>{const row=document.createElement('div');row.className='row';const name=document.createElement('div');name.className='event';name.textContent=labels[e.event]||e.event;const time=document.createElement('div');time.className='time';time.textContent=new Date(e.timestamp).toLocaleString();row.append(name,time);list.appendChild(row);});}status.textContent=events.length+' interaction(s)';}catch(e){status.textContent='Could not load activity. Check the URL, token and Apps Script deployment.';}}
+document.getElementById('refresh').addEventListener('click',load);load();
+</script>
+</body>
+</html>
